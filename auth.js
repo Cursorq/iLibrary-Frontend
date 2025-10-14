@@ -1,174 +1,219 @@
-// ===== Helper Functions =====
+// Base API URL
+const API_BASE = 'http://localhost:8080/public/signup';
 
-// Email validation function
+// ------------------ Utility Functions ------------------
+
+// Email validation
 function validateEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 // Show error message
 function showError(inputId, errorId, message) {
-  const errorElement = document.getElementById(errorId);
-  const inputElement = document.getElementById(inputId);
-  if (errorElement) errorElement.textContent = message;
-  if (inputElement) inputElement.style.borderColor = "hsl(0, 84%, 60%)";
+    const errorElement = document.getElementById(errorId);
+    const inputElement = document.getElementById(inputId);
+
+    if (errorElement) errorElement.textContent = message;
+    if (inputElement) inputElement.style.borderColor = 'hsl(0, 84%, 60%)';
 }
 
 // Clear error message
 function clearError(inputId, errorId) {
-  const errorElement = document.getElementById(errorId);
-  const inputElement = document.getElementById(inputId);
-  if (errorElement) errorElement.textContent = "";
-  if (inputElement) inputElement.style.borderColor = "";
+    const errorElement = document.getElementById(errorId);
+    const inputElement = document.getElementById(inputId);
+
+    if (errorElement) errorElement.textContent = '';
+    if (inputElement) inputElement.style.borderColor = '';
 }
 
-// Show backend response message below form
-function showBackendMessage(containerId, message, type = "success") {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  let messageDiv = container.querySelector(".backend-message");
-  if (!messageDiv) {
-    messageDiv = document.createElement("div");
-    messageDiv.classList.add("backend-message");
-    container.appendChild(messageDiv);
-  }
-
-  messageDiv.textContent = message;
-  messageDiv.style.color = type === "error" ? "red" : "green";
-  messageDiv.style.marginTop = "10px";
-}
-
-// ===== API Base URL =====
-const API_BASE = "http://localhost:8080/public/signup"; // change if backend port differs
-
-// ===== LOGIN HANDLER =====
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  const loginEmail = document.getElementById("loginEmail");
-  const loginPassword = document.getElementById("loginPassword");
-  const loginRole = document.getElementById("loginRole");
-
-  // Email validation
-  loginEmail?.addEventListener("blur", () => {
-    const email = loginEmail.value.trim();
-    if (!email) showError("loginEmail", "loginEmailError", "Email is required");
-    else if (!validateEmail(email))
-      showError("loginEmail", "loginEmailError", "Please enter a valid email");
-    else clearError("loginEmail", "loginEmailError");
-  });
-  loginEmail?.addEventListener("input", () =>
-    clearError("loginEmail", "loginEmailError")
-  );
-
-  // Submit handler
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value;
-    const role = loginRole.value;
-
-    if (!email || !password || !role) {
-      alert("Please fill in all fields");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      showError("loginEmail", "loginEmailError", "Invalid email");
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8080/public/login', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        showBackendMessage("loginForm", data.message || "Invalid credentials", "error");
-        return;
-      }
-
-      // Success
-      showBackendMessage("loginForm", `Welcome back, ${data.username || "User"}!`);
-      console.log("Login response:", data);
-
-      // Redirect to dashboard
-      setTimeout(() => (window.location.href = "dashboard.html"), 1500);
-    } catch (error) {
-      console.error("Login error:", error);
-      showBackendMessage("loginForm", "Error connecting to server", "error");
-    }
-  });
-}
-
-// ===== SIGNUP HANDLER =====
-const signupForm = document.getElementById("signupForm");
+// ------------------ Signup Form ------------------
+const signupForm = document.getElementById('signupForm');
 if (signupForm) {
-  const signupUsername = document.getElementById("signupUsername");
-  const signupEmail = document.getElementById("signupEmail");
-  const signupPassword = document.getElementById("signupPassword");
-  const signupRole = document.getElementById("signupRole");
+    const signupUsername = document.getElementById('signupUsername');
+    const signupEmail = document.getElementById('signupEmail');
+    const signupPassword = document.getElementById('signupPassword');
+    const signupRole = document.getElementById('signupRole');
 
-  // Email validation
-  signupEmail?.addEventListener("blur", () => {
-    const email = signupEmail.value.trim();
-    if (!email) showError("signupEmail", "signupEmailError", "Email is required");
-    else if (!validateEmail(email))
-      showError("signupEmail", "signupEmailError", "Please enter a valid email");
-    else clearError("signupEmail", "signupEmailError");
-  });
-  signupEmail?.addEventListener("input", () =>
-    clearError("signupEmail", "signupEmailError")
-  );
-
-  // Submit handler
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const username = signupUsername.value.trim();
-    const email = signupEmail.value.trim();
-    const password = signupPassword.value;
-    const role = signupRole.value;
-
-    if (!username || !email || !password || !role) {
-      alert("Please fill in all fields");
-      return;
+    // Email validation
+    if (signupEmail) {
+        signupEmail.addEventListener('blur', () => {
+            const email = signupEmail.value.trim();
+            if (!email) {
+                showError('signupEmail', 'signupEmailError', 'Email is required');
+            } else if (!validateEmail(email)) {
+                showError('signupEmail', 'signupEmailError', 'Please enter a valid email address');
+            } else {
+                clearError('signupEmail', 'signupEmailError');
+            }
+        });
+        signupEmail.addEventListener('input', () => clearError('signupEmail', 'signupEmailError'));
     }
 
-    if (!validateEmail(email)) {
-      showError("signupEmail", "signupEmailError", "Invalid email");
-      return;
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = signupUsername.value.trim();
+        const email = signupEmail.value.trim();
+        const password = signupPassword.value;
+        const roleValue = signupRole.value;
+
+        // Validate fields
+        if (!username || !email || !password || !roleValue) {
+            alert('Please fill in all fields.');
+            return;
+        }
+        if (!validateEmail(email)) {
+            showError('signupEmail', 'signupEmailError', 'Please enter a valid email address');
+            return;
+        }
+
+        const userData = {
+            username,
+            email,
+            password,
+            role: [roleValue] // sending role as array of strings
+        };
+
+        try {
+            const res = await fetch('http://localhost:8080/public/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || 'Signup failed');
+            }
+
+            const data = await res.json();
+            alert(`Signup successful! ${data.message || 'You can now log in.'}`);
+            closeSignupModal();
+            showLoginModal();
+
+        } catch (err) {
+            console.error(err);
+            alert(`Signup error: ${err.message}`);
+        }
+    });
+}
+
+// ------------------ Login Form ------------------
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginRole = document.getElementById('loginRole');
+
+    if (loginEmail) {
+        loginEmail.addEventListener('blur', () => {
+            const email = loginEmail.value.trim();
+            if (!email) {
+                showError('loginEmail', 'loginEmailError', 'Email is required');
+            } else if (!validateEmail(email)) {
+                showError('loginEmail', 'loginEmailError', 'Please enter a valid email address');
+            } else {
+                clearError('loginEmail', 'loginEmailError');
+            }
+        });
+        loginEmail.addEventListener('input', () => clearError('loginEmail', 'loginEmailError'));
     }
 
-    try {
-      const response = await fetch('http://localhost:8080/public/signup', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, role }),
-      });
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const data = await response.json();
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
+        const roleValue = loginRole.value;
 
-      if (!response.ok) {
-        showBackendMessage("signupForm", data.message || "Signup failed", "error");
-        return;
-      }
+        if (!email || !password || !roleValue) {
+            alert('Please fill in all fields.');
+            return;
+        }
+        if (!validateEmail(email)) {
+            showError('loginEmail', 'loginEmailError', 'Please enter a valid email address');
+            return;
+        }
 
-      // Success
-      showBackendMessage("signupForm", "Account created successfully! You can now log in.");
-      console.log("Signup response:", data);
+        const loginData = {
+            email,
+            password,
+            role: [roleValue] // sending as array for backend
+        };
 
-      // Automatically show login modal
-      document.getElementById("signupModal")?.classList.remove("active");
-      document.getElementById("loginModal")?.classList.add("active");
-    } catch (error) {
-      console.error("Signup error:", error);
-      showBackendMessage("signupForm", "Error connecting to server", "error");
+        try {
+            const res = await fetch('http://localhost:8080/public/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || 'Invalid credentials');
+            }
+
+            const data = await res.json();
+            alert(`Login successful! Welcome ${data.username || 'user'}.`);
+            window.location.href = '/dashboard.html'; // redirect after login
+
+        } catch (err) {
+            console.error(err);
+            alert(`Login error: ${err.message}`);
+        }
+    });
+}
+
+// ------------------ Modal Helpers ------------------
+function showLoginModal() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
-  });
+}
+
+function showSignupModal() {
+    const signupModal = document.getElementById('signupModal');
+    if (signupModal) {
+        signupModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLoginModal() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function closeSignupModal() {
+    const signupModal = document.getElementById('signupModal');
+    if (signupModal) {
+        signupModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Modal switch links
+const switchToSignup = document.getElementById('switchToSignup');
+const switchToLogin = document.getElementById('switchToLogin');
+
+if (switchToSignup) {
+    switchToSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeLoginModal();
+        showSignupModal();
+    });
+}
+
+if (switchToLogin) {
+    switchToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSignupModal();
+        showLoginModal();
+    });
 }
