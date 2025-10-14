@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Book your library seat - Choose duration, select your seat, and confirm booking. Simple 3-step process for hassle-free library seat reservation.">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Mobile Optimization -->
+    <meta name="theme-color" content="#3B82F6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <title>Book Your Seat - iLibrary Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span class="brand-name">iLibrary</span>
+            </div>
+            
+            <div class="nav-user">
+                <span class="user-name" id="userName">Welcome, User</span>
+                <button class="btn btn-outline btn-small" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Book Your Seat</h1>
+                <p class="dashboard-subtitle">Select your duration and choose your perfect study spot</p>
+            </div>
+
+            <!-- Step Indicators -->
+            <div class="steps">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Duration</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Select Seat</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+
+            <!-- Duration Selection -->
+            <div class="booking-section" id="durationSection">
+                <div class="booking-card">
+                    <h2 class="card-title">How long do you need the seat?</h2>
+                    <p class="card-subtitle">Choose between 1 to 12 hours</p>
+                    
+                    <div class="duration-selector">
+                        <button class="duration-btn" id="decreaseHours" aria-label="Decrease hours">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                        
+                        <div class="duration-display">
+                            <span class="duration-value" id="durationValue">1</span>
+                            <span class="duration-unit">hour<span id="hourPlural"></span></span>
+                        </div>
+                        
+                        <button class="duration-btn" id="increaseHours" aria-label="Increase hours">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <input type="range" id="durationSlider" min="1" max="12" value="1" class="duration-slider">
+                    
+                    <div class="duration-info">
+                        <div class="info-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>Start time: <strong id="startTime">Now</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>End time: <strong id="endTime">-</strong></span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" id="proceedToSeats">Continue to Seat Selection</button>
+                </div>
+            </div>
+
+            <!-- Seat Selection -->
+            <div class="booking-section hidden" id="seatSection">
+                <div class="booking-card">
+                    <div class="seat-header">
+                        <div>
+                            <h2 class="card-title">Select Your Seat</h2>
+                            <p class="card-subtitle">Click on an available seat to select it</p>
+                        </div>
+                        <button class="btn btn-outline" id="backToDuration">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            Back
+                        </button>
+                    </div>
+                    
+                    <div class="seat-legend">
+                        <div class="legend-item">
+                            <div class="legend-color available"></div>
+                            <span>Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color unavailable"></div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color selected"></div>
+                            <span>Your Selection</span>
+                        </div>
+                    </div>
+                    
+                    <div class="seat-grid" id="seatGrid">
+                        <!-- Seats will be dynamically generated by JavaScript -->
+                    </div>
+                    
+                    <div class="selected-seat-info" id="selectedSeatInfo">
+                        <p>No seat selected</p>
+                    </div>
+                    
+                    <button class="btn btn-primary btn-large" id="confirmBooking" disabled>Confirm Booking</button>
+                </div>
+            </div>
+
+            <!-- Confirmation -->
+            <div class="booking-section hidden" id="confirmationSection">
+                <div class="booking-card confirmation-card">
+                    <div class="success-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    
+                    <h2 class="card-title">Booking Confirmed!</h2>
+                    <p class="card-subtitle">Your seat has been successfully reserved</p>
+                    
+                    <div class="booking-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Seat Number</span>
+                            <span class="detail-value" id="confirmedSeat">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Duration</span>
+                            <span class="detail-value" id="confirmedDuration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Start Time</span>
+                            <span class="detail-value" id="confirmedStartTime">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">End Time</span>
+                            <span class="detail-value" id="confirmedEndTime">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="confirmation-actions">
+                        <button class="btn btn-primary" id="bookAnother">Book Another Seat</button>
+                        <button class="btn btn-outline" id="goHome">Go to Homepage</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
