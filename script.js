@@ -1,4 +1,6 @@
-// Main JavaScript for Homepage
+// ========================
+// Navbar and UI Interactions
+// ========================
 
 // Hamburger Menu Toggle
 const hamburger = document.getElementById('hamburger');
@@ -19,104 +21,61 @@ if (closeMenu) {
     });
 }
 
-// Close mobile menu when clicking on a link
-const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-mobileNavLinks.forEach(link => {
+// Close mobile menu when clicking a link
+document.querySelectorAll('.mobile-nav-link').forEach(link => {
     link.addEventListener('click', () => {
         hamburger.classList.remove('active');
         mobileMenu.classList.remove('active');
     });
 });
 
-// Smooth scroll for navigation links
+// Smooth scroll for navigation
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
 });
 
-// Update active nav link on scroll
+// Active nav highlight
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 
 function updateActiveNav() {
     let current = '';
-    
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
         const sectionHeight = section.clientHeight;
-        if (scrollY >= (sectionTop - 100)) {
-            current = section.getAttribute('id');
-        }
+        if (scrollY >= sectionTop - 100) current = section.id;
     });
 
     navLinks.forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-            link.classList.add('active');
-        }
+        if (link.getAttribute('href') === `#${current}`) link.classList.add('active');
     });
 }
 
 window.addEventListener('scroll', updateActiveNav);
 
-// Contact Form Submission
-const contactForm = document.getElementById('contactForm');
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(contactForm);
-        const data = Object.fromEntries(formData);
-        
-        // Simulate form submission
-        alert(`Thank you for contacting us, ${data.name}! We'll get back to you soon.`);
-        contactForm.reset();
-    });
-}
+// ========================
+// Hero and Modal Management
+// ========================
 
-// Hero Button Actions
 const heroBookBtn = document.getElementById('heroBookBtn');
 const heroLearnBtn = document.getElementById('heroLearnBtn');
 const mobileLoginBtn = document.getElementById('mobileLoginBtn');
 const mobileSignupBtn = document.getElementById('mobileSignupBtn');
 
-// Check if user is logged in
-// function checkAuth() {
-//     const user = JSON.parse(localStorage.getItem('currentUser'));
-//     if (user) {
-//         // Redirect to dashboard if logged in
-//         window.location.href = 'dashboard.html';
-//     } else {
-//         // Show login modal if not logged in
-//         showLoginModal();
-//     }
-// }
 function checkAuth() {
- //Temp
- showLoginModal();
-
- //window.location.href = 'dashboard.html';
+    // Always show login modal since backend handles sessions
+    showLoginModal();
 }
 
-
-if (heroBookBtn) {
-    heroBookBtn.addEventListener('click', checkAuth);
-}
-
-if (heroLearnBtn) {
-    heroLearnBtn.addEventListener('click', () => {
-        document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
-    });
-}
-
+if (heroBookBtn) heroBookBtn.addEventListener('click', checkAuth);
+if (heroLearnBtn) heroLearnBtn.addEventListener('click', () => {
+    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+});
 if (mobileLoginBtn) {
     mobileLoginBtn.addEventListener('click', () => {
         hamburger.classList.remove('active');
@@ -124,94 +83,153 @@ if (mobileLoginBtn) {
         showLoginModal();
     });
 }
-
 if (mobileSignupBtn) {
     mobileSignupBtn.addEventListener('click', () => {
         hamburger.classList.remove('active');
         mobileMenu.classList.remove('active');
         showSignupModal();
     });
-}
+};
 
+// ========================
 // Modal Functions
+// ========================
+
 function showLoginModal() {
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-        loginModal.classList.add('active');
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 }
 
 function showSignupModal() {
-    const signupModal = document.getElementById('signupModal');
-    if (signupModal) {
-        signupModal.classList.add('active');
+    const modal = document.getElementById('signupModal');
+    if (modal) {
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 }
 
 function closeLoginModal() {
-    const loginModal = document.getElementById('loginModal');
-    if (loginModal) {
-        loginModal.classList.remove('active');
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.remove('active');
         document.body.style.overflow = '';
     }
 }
 
 function closeSignupModal() {
-    const signupModal = document.getElementById('signupModal');
-    if (signupModal) {
-        signupModal.classList.remove('active');
+    const modal = document.getElementById('signupModal');
+    if (modal) {
+        modal.classList.remove('active');
         document.body.style.overflow = '';
     }
 }
 
-// Modal Close Buttons
-const closeLogin = document.getElementById('closeLogin');
-const closeSignup = document.getElementById('closeSignup');
-const loginOverlay = document.getElementById('loginOverlay');
-const signupOverlay = document.getElementById('signupOverlay');
+// Close modals
+document.getElementById('closeLogin')?.addEventListener('click', closeLoginModal);
+document.getElementById('closeSignup')?.addEventListener('click', closeSignupModal);
+document.getElementById('loginOverlay')?.addEventListener('click', closeLoginModal);
+document.getElementById('signupOverlay')?.addEventListener('click', closeSignupModal);
 
-if (closeLogin) {
-    closeLogin.addEventListener('click', closeLoginModal);
-}
+// Switch Modals
+document.getElementById('switchToSignup')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeLoginModal();
+    showSignupModal();
+});
 
-if (closeSignup) {
-    closeSignup.addEventListener('click', closeSignupModal);
-}
+document.getElementById('switchToLogin')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeSignupModal();
+    showLoginModal();
+});
 
-if (loginOverlay) {
-    loginOverlay.addEventListener('click', closeLoginModal);
-}
-
-if (signupOverlay) {
-    signupOverlay.addEventListener('click', closeSignupModal);
-}
-
-// Switch between Login and Signup
-const switchToSignup = document.getElementById('switchToSignup');
-const switchToLogin = document.getElementById('switchToLogin');
-
-if (switchToSignup) {
-    switchToSignup.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeLoginModal();
-        showSignupModal();
-    });
-}
-
-if (switchToLogin) {
-    switchToLogin.addEventListener('click', (e) => {
-        e.preventDefault();
-        closeSignupModal();
-        showLoginModal();
-    });
-}
-
-// Close modals on Escape key
+// Escape closes modals
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
         closeLoginModal();
         closeSignupModal();
     }
 });
+
+// ========================
+// AUTH: Async Backend Integration
+// ========================
+
+const API_BASE = 'http://localhost:8080/public/signup'; // Adjust base URL if needed
+
+const signupForm = document.getElementById('signupForm');
+const loginForm = document.getElementById('loginForm');
+
+async function handleSignup(e) {
+    e.preventDefault();
+
+    const userData = {
+        username: document.getElementById('signupUsername').value.trim(),
+        email: document.getElementById('signupEmail').value.trim(),
+        password: document.getElementById('signupPassword').value.trim(),
+        role: document.getElementById('signupRole').value
+    };
+
+    const messageBox = document.getElementById('signupMessage');
+    messageBox.textContent = 'Creating your account...';
+
+    try {
+        const res = await fetch(`${API_BASE}/public/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+        messageBox.textContent = 'Signup successful! Please login.';
+        setTimeout(() => {
+            closeSignupModal();
+            showLoginModal();
+        }, 1000);
+    } catch (err) {
+        messageBox.textContent = `❌ ${err.message}`;
+        console.error(err);
+    }
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+
+    const loginData = {
+        email: document.getElementById('loginEmail').value.trim(),
+        password: document.getElementById('loginPassword').value.trim(),
+        role: document.getElementById('loginRole').value
+    };
+
+    const messageBox = document.getElementById('loginMessage');
+    messageBox.textContent = 'Logging in...';
+
+    try {
+        const res = await fetch(`${API_BASE}/public/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginData)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Invalid credentials');
+
+        messageBox.textContent = `✅ Welcome, ${data.user?.username || 'User'}! Redirecting...`;
+
+        // Redirect to dashboard (backend maintains session via cookie or token)
+        setTimeout(() => {
+            window.location.href = '/dashboard.html';
+        }, 1000);
+    } catch (err) {
+        messageBox.textContent = `❌ ${err.message}`;
+        console.error(err);
+    }
+}
+
+if (signupForm) signupForm.addEventListener('submit', handleSignup);
+if (loginForm) loginForm.addEventListener('submit', handleLogin);
