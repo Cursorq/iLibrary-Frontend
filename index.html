@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -248,7 +248,7 @@
                     </div>
                     <div class="form-group">
                         <label for="contactEmail">Email</label>
-                        <input type="email" id="contactEmail" name="email" required>
+                        <input type="email" id="contactEmail" name="username" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -296,9 +296,9 @@
             
             <form class="auth-form" id="loginForm">
                 <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" name="email" required>
-                    <span class="error-message" id="loginEmailError"></span>
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" name="username" required>
+                    <span class="error-message" id="loginUsernameError"></span>
                 </div>
                 
                 <div class="form-group">
@@ -306,15 +306,6 @@
                     <input type="password" id="loginPassword" name="password" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="loginRole">Login as</label>
-                    <select id="loginRole" name="role" required>
-                        <option value="">Select Role</option>
-                        <option value="user">User</option>
-                        <option value="librarian">Librarian</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">Login</button>
                 
@@ -348,7 +339,7 @@
                 
                 <div class="form-group">
                     <label for="signupEmail">Email</label>
-                    <input type="email" id="signupEmail" name="email" required>
+                    <input type="email" id="signupEmail" name="username" required>
                     <span class="error-message" id="signupEmailError"></span>
                 </div>
                 
@@ -377,8 +368,8 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src="auth.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/auth.js"></script>
     
 </body>
 </html>

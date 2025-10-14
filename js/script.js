@@ -32,9 +32,12 @@ document.querySelectorAll('.mobile-nav-link').forEach(link => {
 // Smooth scroll for navigation
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
+        const href = this.getAttribute('href');
+        if (href && href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        }
     });
 });
 
@@ -68,8 +71,15 @@ const mobileLoginBtn = document.getElementById('mobileLoginBtn');
 const mobileSignupBtn = document.getElementById('mobileSignupBtn');
 
 function checkAuth() {
-    // Always show login modal since backend handles sessions
-    showLoginModal();
+    // Check if user is authenticated
+    const token = localStorage.getItem('jwtToken');
+    if (token) {
+        // User is logged in, go to dashboard
+        window.location.href = 'dashboard.html';
+    } else {
+        // Show login modal
+        showLoginModal();
+    }
 }
 
 if (heroBookBtn) heroBookBtn.addEventListener('click', checkAuth);
@@ -89,7 +99,7 @@ if (mobileSignupBtn) {
         mobileMenu.classList.remove('active');
         showSignupModal();
     });
-};
+}
 
 // ========================
 // Modal Functions
@@ -155,81 +165,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ========================
-// AUTH: Async Backend Integration
+// Contact Form Handler
 // ========================
-
-const API_BASE = 'http://localhost:8080/public/signup'; // Adjust base URL if needed
-
-const signupForm = document.getElementById('signupForm');
-const loginForm = document.getElementById('loginForm');
-
-async function handleSignup(e) {
-    e.preventDefault();
-
-    const userData = {
-        username: document.getElementById('signupUsername').value.trim(),
-        email: document.getElementById('signupEmail').value.trim(),
-        password: document.getElementById('signupPassword').value.trim(),
-        role: document.getElementById('signupRole').value
-    };
-
-    const messageBox = document.getElementById('signupMessage');
-    messageBox.textContent = 'Creating your account...';
-
-    try {
-        const res = await fetch(`${API_BASE}/public/signup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userData)
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Signup failed');
-
-        messageBox.textContent = 'Signup successful! Please login.';
-        setTimeout(() => {
-            closeSignupModal();
-            showLoginModal();
-        }, 1000);
-    } catch (err) {
-        messageBox.textContent = `❌ ${err.message}`;
-        console.error(err);
-    }
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
 }
-
-async function handleLogin(e) {
-    e.preventDefault();
-
-    const loginData = {
-        email: document.getElementById('loginEmail').value.trim(),
-        password: document.getElementById('loginPassword').value.trim(),
-        role: document.getElementById('loginRole').value
-    };
-
-    const messageBox = document.getElementById('loginMessage');
-    messageBox.textContent = 'Logging in...';
-
-    try {
-        const res = await fetch(`${API_BASE}/public/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData)
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Invalid credentials');
-
-        messageBox.textContent = `✅ Welcome, ${data.user?.username || 'User'}! Redirecting...`;
-
-        // Redirect to dashboard (backend maintains session via cookie or token)
-        setTimeout(() => {
-            window.location.href = '/dashboard.html';
-        }, 1000);
-    } catch (err) {
-        messageBox.textContent = `❌ ${err.message}`;
-        console.error(err);
-    }
-}
-
-if (signupForm) signupForm.addEventListener('submit', handleSignup);
-if (loginForm) loginForm.addEventListener('submit', handleLogin);

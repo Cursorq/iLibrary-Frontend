@@ -1,11 +1,26 @@
-// Dashboard JavaScript for Seat Booking
+// Dashboard JavaScript for Seat Booking with Backend Integration
+
+// API Configuration
+const API_BASE_URL = 'http://localhost:8080';
+
+// Get token from localStorage
+function getToken() {
+    return localStorage.getItem('jwtToken');
+}
+
+function getUserInfo() {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+}
 
 // Check authentication
 function checkDashboardAuth() {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const token = getToken();
+    const user = getUserInfo();
     
-    if (!user) {
-        window.location.href = 'dashboard.html';
+    if (!token || !user) {
+        window.location.href = 'index.html';
+        return null;
     }
     
     return user;
@@ -27,6 +42,7 @@ const logoutBtn = document.getElementById('logoutBtn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
         if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('jwtToken');
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
@@ -184,7 +200,7 @@ if (backToDuration) {
     });
 }
 
-// Generate seats
+// Generate seats (simplified - showing L-1 to L-60 format as per API)
 function generateSeats() {
     const seatGrid = document.getElementById('seatGrid');
     if (!seatGrid) return;
@@ -192,27 +208,24 @@ function generateSeats() {
     // Clear existing seats
     seatGrid.innerHTML = '';
     
-    // Get existing bookings from localStorage
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    const occupiedSeats = bookings.map(b => b.seatNumber);
-    
-    // Generate 60 seats
+    // Generate 60 seats in L-X format (as per API example)
     const totalSeats = 60;
     
     for (let i = 1; i <= totalSeats; i++) {
         const seat = document.createElement('button');
         seat.className = 'seat';
-        seat.textContent = i;
-        seat.dataset.seatNumber = i;
+        const seatNumber = `L-${i}`;
+        seat.textContent = seatNumber;
+        seat.dataset.seatNumber = seatNumber;
         
-        // Randomly mark some seats as unavailable (or use occupied from bookings)
-        if (occupiedSeats.includes(i) || Math.random() > 0.7) {
+        // Randomly mark some seats as unavailable for demo
+        if (Math.random() > 0.7) {
             seat.classList.add('unavailable');
         } else {
             seat.classList.add('available');
             
             seat.addEventListener('click', () => {
-                selectSeat(i);
+                selectSeat(seatNumber);
             });
         }
         
@@ -249,46 +262,76 @@ function selectSeat(seatNumber) {
     }
 }
 
-// Confirm booking
+// Confirm booking - Call Backend API
 const confirmBooking = document.getElementById('confirmBooking');
 if (confirmBooking) {
-    confirmBooking.addEventListener('click', () => {
+    confirmBooking.addEventListener('click', async () => {
         if (!bookingState.selectedSeat) {
             alert('Please select a seat first');
             return;
         }
         
-        // Create booking
-        const booking = {
-            id: Date.now().toString(),
-            userId: currentUser.id,
-            username: currentUser.username,
-            seatNumber: bookingState.selectedSeat,
-            duration: bookingState.duration,
-            startTime: bookingState.startTime.toISOString(),
-            endTime: bookingState.endTime.toISOString(),
-            createdAt: new Date().toISOString()
-        };
+        const token = getToken();
+        if (!token) {
+            alert('You are not authenticated. Please login again.');
+            window.location.href = 'index.html';
+            return;
+        }
         
-        // Save booking to localStorage
-        const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-        bookings.push(booking);
-        localStorage.setItem('bookings', JSON.stringify(bookings));
+        // Disable button to prevent double clicks
+        confirmBooking.disabled = true;
+        confirmBooking.textContent = 'Booking...';
         
-        // Update confirmation display
-        document.getElementById('confirmedSeat').textContent = `Seat ${bookingState.selectedSeat}`;
-        document.getElementById('confirmedDuration').textContent = `${bookingState.duration} hour${bookingState.duration === 1 ? '' : 's'}`;
-        document.getElementById('confirmedStartTime').textContent = bookingState.startTime.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        document.getElementById('confirmedEndTime').textContent = bookingState.endTime.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        // Show confirmation
-        showConfirmationSection();
+        try {
+            // Call backend booking API
+            const response = await fetch(`${API_BASE_URL}/booking/seat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    seatNumber: bookingState.selectedSeat,
+                    hours: bookingState.duration
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Booking failed');
+            }
+            
+            // Response is plain text confirmation
+            const message = await response.text();
+            console.log('Booking response:', message);
+            
+            // Update confirmation display
+            document.getElementById('confirmedSeat').textContent = `Seat ${bookingState.selectedSeat}`;
+            document.getElementById('confirmedDuration').textContent = `${bookingState.duration} hour${bookingState.duration === 1 ? '' : 's'}`;
+            document.getElementById('confirmedStartTime').textContent = bookingState.startTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('confirmedEndTime').textContent = bookingState.endTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            // Show confirmation
+            showConfirmationSection();
+            
+            // Reset button
+            confirmBooking.disabled = false;
+            confirmBooking.textContent = 'Confirm Booking';
+            
+        } catch (error) {
+            console.error('Booking error:', error);
+            alert(`Booking failed: ${error.message}`);
+            
+            // Re-enable button
+            confirmBooking.disabled = false;
+            confirmBooking.textContent = 'Confirm Booking';
+        }
     });
 }
 
