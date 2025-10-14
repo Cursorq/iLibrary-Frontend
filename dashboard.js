@@ -4,10 +4,8 @@
 function checkDashboardAuth() {
     const user = JSON.parse(localStorage.getItem('currentUser'));
     
-    if (user) {
-        alert('Please login to access the dashboard');
+    if (!user) {
         window.location.href = 'dashboard.html';
-        return null;
     }
     
     return user;
